@@ -572,7 +572,10 @@ Respond with a JSON object ONLY containing:
 
           const text = response.text || '{}';
           const parsed = JSON.parse(text);
-          return res.json(parsed);
+          return res.json({
+            engineSource: 'GEMINI_2.5_FLASH',
+            ...parsed
+          });
         } catch (geminiError) {
           console.warn('Gemini API call encountered error, providing fallback portfolio risk analysis:', geminiError);
         }
@@ -601,6 +604,7 @@ Respond with a JSON object ONLY containing:
         }));
 
       res.json({
+        engineSource: 'LOCAL_FALLBACK_ENGINE',
         summary: `Daima Motorcycles portfolio holds ${customers.length} active contracts with an overall collection efficiency of ${repaymentRate}%. Currently, ${highRiskCount} account(s) exhibit delinquency or immobilizer locks requiring proactive field follow-up.`,
         riskAssessment: {
           highRiskCount,

@@ -126,6 +126,7 @@ export interface SecurityConfig {
 }
 
 export interface AIAnalysisResult {
+  engineSource?: 'GEMINI_2.5_FLASH' | 'LOCAL_FALLBACK_ENGINE';
   summary: string;
   riskAssessment: {
     highRiskCount: number;

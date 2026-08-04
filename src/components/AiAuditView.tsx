@@ -82,10 +82,25 @@ export const AiAuditView: React.FC<AiAuditViewProps> = ({ customers }) => {
         <div className="space-y-6">
           {/* Executive Summary Card */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 border-b border-slate-100 pb-3">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              Portfolio Executive Health Summary
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                Portfolio Executive Health Summary
+              </h3>
+
+              {/* Engine Source Badge */}
+              <div className="text-xs">
+                {auditResult.engineSource === 'GEMINI_2.5_FLASH' ? (
+                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full font-bold text-[11px] flex items-center gap-1.5 inline-flex">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Engine: Gemini 2.5 Flash API (Live Cloud AI)
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full font-bold text-[11px] flex items-center gap-1.5 inline-flex">
+                    <Cpu className="w-3.5 h-3.5 text-amber-700" /> Engine: Local Heuristic Risk Audit (Fallback)
+                  </span>
+                )}
+              </div>
+            </div>
 
             <p className="text-xs text-slate-700 leading-relaxed font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
               "{auditResult.summary}"
