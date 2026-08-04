@@ -2,6 +2,37 @@ export type RepaymentFrequency = 'DAILY' | 'WEEKLY' | 'MONTHLY';
 export type LoanStatus = 'ACTIVE' | 'PAID_OFF' | 'OVERDUE' | 'DEFAULT_RISK';
 export type MatchStatus = 'AUTOMATICALLY_MATCHED' | 'MANUALLY_RECONCILED' | 'UNMATCHED_PENDING_REVIEW' | 'REJECTED';
 
+export type UserRole = 
+  | 'VENDOR'             // Dealership Dealer Staff
+  | 'REGIONAL_HQ'        // Regional Credit Officer
+  | 'DAR_HEAD_OFFICE'    // Dar es Salaam Head Office Loan Approver
+  | 'ADMINISTRATOR'      // System Security Administrator
+  | 'FIELD_COLLECTIONS'; // GPRS & Field Recovery Officer
+
+export type LoanApprovalStage = 
+  | 'DRAFT_VENDOR'
+  | 'PENDING_REGIONAL_REVIEW'
+  | 'PENDING_DAR_HO_APPROVAL'
+  | 'APPROVED_ACTIVE'
+  | 'REJECTED';
+
+export interface GprsDeviceInfo {
+  deviceId: string;
+  imei: string;
+  lat: number;
+  lng: number;
+  locationName: string;
+  region: string;
+  engineStatus: 'ACTIVE' | 'IMMOBILIZED';
+  speedKmH: number;
+  batteryPercent: number;
+  signalStrengthPercent: number;
+  lastPingTimestamp: string;
+  immobilizedBy?: string;
+  immobilizedAt?: string;
+  immobilizeReason?: string;
+}
+
 export interface CustomerCreditContract {
   id: string; // e.g. "DM-TZ-1001"
   crdbControlNumber: string; // e.g. "992001001"
@@ -26,9 +57,15 @@ export interface CustomerCreditContract {
   totalPaid: number; // in TZS
   remainingBalance: number; // in TZS
   loanStatus: LoanStatus;
+  approvalStage: LoanApprovalStage;
+  submittedByVendor: string;
+  regionalApprovalBy?: string;
+  darHoApprovalBy?: string;
+  rejectionReason?: string;
   lastPaymentDate?: string;
   nextPaymentDueDate: string;
   overdueDays: number;
+  gprsInfo?: GprsDeviceInfo;
   notes?: string;
 }
 
@@ -61,6 +98,31 @@ export interface ReconcileStats {
   autoMatchedRate: number; // Percentage, e.g. 96.8%
   unmatchedCount: number;
   todayCollectionTZS: number;
+  pendingApprovalsCount: number;
+  immobilizedBikesCount: number;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  userName: string;
+  userRole: UserRole;
+  region: string;
+  actionCategory: 'LOAN_WORKFLOW' | 'RECONCILIATION' | 'GPRS_IMMOBILIZER' | 'SECURITY_CONFIG' | 'SYSTEM_EVENT';
+  actionDetails: string;
+  targetId?: string; // Contract ID or Txn ID
+  ipAddress: string;
+  severity: 'INFO' | 'WARNING' | 'CRITICAL';
+}
+
+export interface SecurityConfig {
+  require2FAForDarHO: boolean;
+  ipWhitelistEnabled: boolean;
+  whitelistedSubnets: string[];
+  sessionTimeoutMinutes: number;
+  lastSecretRotationDate: string;
+  failedLoginAttemptsCount: number;
+  activeSessionsCount: number;
 }
 
 export interface AIAnalysisResult {

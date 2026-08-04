@@ -1,4 +1,4 @@
-import { CustomerCreditContract, CRDBTransaction } from '../types';
+import { CustomerCreditContract, CRDBTransaction, AuditLogEntry, SecurityConfig } from '../types';
 
 export const INITIAL_CUSTOMERS: CustomerCreditContract[] = [
   {
@@ -25,9 +25,26 @@ export const INITIAL_CUSTOMERS: CustomerCreditContract[] = [
     totalPaid: 1160000,
     remainingBalance: 1840000,
     loanStatus: 'ACTIVE',
+    approvalStage: 'APPROVED_ACTIVE',
+    submittedByVendor: 'Kinondoni TVS Dealership',
+    regionalApprovalBy: 'Regional Mgr Dar (S. Temba)',
+    darHoApprovalBy: 'Dar HO Credit Mgr (F. Mwangi)',
     lastPaymentDate: '2026-08-02',
     nextPaymentDueDate: '2026-08-03',
     overdueDays: 0,
+    gprsInfo: {
+      deviceId: 'GPS-TZ-0841',
+      imei: '869201049102910',
+      lat: -6.7821,
+      lng: 39.2201,
+      locationName: 'Ubungo Bus Terminal, Dar es Salaam',
+      region: 'Dar es Salaam',
+      engineStatus: 'ACTIVE',
+      speedKmH: 34,
+      batteryPercent: 92,
+      signalStrengthPercent: 98,
+      lastPingTimestamp: '2 mins ago'
+    },
     notes: 'Rider operates route Ubungo - Mwenge. Reliable daily payer via CRDB SimBanking.'
   },
   {
@@ -54,9 +71,26 @@ export const INITIAL_CUSTOMERS: CustomerCreditContract[] = [
     totalPaid: 1512000,
     remainingBalance: 1638000,
     loanStatus: 'ACTIVE',
+    approvalStage: 'APPROVED_ACTIVE',
+    submittedByVendor: 'Ilala Bajaj Sales Centre',
+    regionalApprovalBy: 'Regional Mgr Dar (S. Temba)',
+    darHoApprovalBy: 'Dar HO Credit Mgr (F. Mwangi)',
     lastPaymentDate: '2026-07-28',
     nextPaymentDueDate: '2026-08-04',
     overdueDays: 0,
+    gprsInfo: {
+      deviceId: 'GPS-TZ-0842',
+      imei: '869201049102911',
+      lat: -6.8162,
+      lng: 39.2801,
+      locationName: 'Kariakoo Market Square, Dar es Salaam',
+      region: 'Dar es Salaam',
+      engineStatus: 'ACTIVE',
+      speedKmH: 18,
+      batteryPercent: 88,
+      signalStrengthPercent: 95,
+      lastPingTimestamp: '1 min ago'
+    },
     notes: 'Courier delivery business in Kariakoo market area.'
   },
   {
@@ -83,9 +117,26 @@ export const INITIAL_CUSTOMERS: CustomerCreditContract[] = [
     totalPaid: 322000,
     remainingBalance: 2558000,
     loanStatus: 'OVERDUE',
+    approvalStage: 'APPROVED_ACTIVE',
+    submittedByVendor: 'Arusha Motors Ltd',
+    regionalApprovalBy: 'Regional Mgr Arusha (P. Lyimo)',
+    darHoApprovalBy: 'Dar HO Credit Mgr (F. Mwangi)',
     lastPaymentDate: '2026-07-25',
     nextPaymentDueDate: '2026-07-26',
     overdueDays: 8,
+    gprsInfo: {
+      deviceId: 'GPS-TZ-0843',
+      imei: '869201049102912',
+      lat: -3.3812,
+      lng: 36.6920,
+      locationName: 'Njiro Road, Arusha',
+      region: 'Arusha',
+      engineStatus: 'ACTIVE',
+      speedKmH: 0,
+      batteryPercent: 74,
+      signalStrengthPercent: 90,
+      lastPingTimestamp: '5 mins ago'
+    },
     notes: 'Tour guide rider in Njiro. Late on last 8 daily installments. Requires WhatsApp follow-up.'
   },
   {
@@ -112,9 +163,26 @@ export const INITIAL_CUSTOMERS: CustomerCreditContract[] = [
     totalPaid: 1680000,
     remainingBalance: 970000,
     loanStatus: 'ACTIVE',
+    approvalStage: 'APPROVED_ACTIVE',
+    submittedByVendor: 'Dodoma Moto Supplies',
+    regionalApprovalBy: 'Regional Mgr Dodoma (M. Kimaro)',
+    darHoApprovalBy: 'Dar HO Credit Mgr (F. Mwangi)',
     lastPaymentDate: '2026-08-01',
     nextPaymentDueDate: '2026-08-02',
     overdueDays: 1,
+    gprsInfo: {
+      deviceId: 'GPS-TZ-0844',
+      imei: '869201049102913',
+      lat: -6.1731,
+      lng: 35.7410,
+      locationName: 'Nzuguni Sub-Station, Dodoma',
+      region: 'Dodoma',
+      engineStatus: 'ACTIVE',
+      speedKmH: 22,
+      batteryPercent: 80,
+      signalStrengthPercent: 92,
+      lastPingTimestamp: '3 mins ago'
+    },
     notes: 'Sub-station rider in Nzuguni area.'
   },
   {
@@ -141,9 +209,26 @@ export const INITIAL_CUSTOMERS: CustomerCreditContract[] = [
     totalPaid: 3000000,
     remainingBalance: 0,
     loanStatus: 'PAID_OFF',
+    approvalStage: 'APPROVED_ACTIVE',
+    submittedByVendor: 'Mwanza Lake Motors',
+    regionalApprovalBy: 'Regional Mgr Mwanza (G. Nyerere)',
+    darHoApprovalBy: 'Dar HO Credit Mgr (F. Mwangi)',
     lastPaymentDate: '2026-07-29',
     nextPaymentDueDate: 'COMPLETED',
     overdueDays: 0,
+    gprsInfo: {
+      deviceId: 'GPS-TZ-0845',
+      imei: '869201049102914',
+      lat: -2.5164,
+      lng: 32.9032,
+      locationName: 'Nyamagana Depot, Mwanza',
+      region: 'Mwanza',
+      engineStatus: 'ACTIVE',
+      speedKmH: 0,
+      batteryPercent: 100,
+      signalStrengthPercent: 99,
+      lastPingTimestamp: '10 mins ago'
+    },
     notes: 'Loan fully cleared ahead of schedule! Certificate of ownership issued.'
   },
   {
@@ -170,12 +255,155 @@ export const INITIAL_CUSTOMERS: CustomerCreditContract[] = [
     totalPaid: 210000,
     remainingBalance: 2550000,
     loanStatus: 'DEFAULT_RISK',
+    approvalStage: 'APPROVED_ACTIVE',
+    submittedByVendor: 'Mbeya Highlands Dealer',
+    regionalApprovalBy: 'Regional Mgr Mbeya (E. Sanga)',
+    darHoApprovalBy: 'Dar HO Credit Mgr (F. Mwangi)',
     lastPaymentDate: '2026-06-10',
     nextPaymentDueDate: '2026-06-11',
     overdueDays: 53,
-    notes: 'Severe delinquency. Phone intermittently reachable. Field team assigned for vehicle GPS audit.'
+    gprsInfo: {
+      deviceId: 'GPS-TZ-0846',
+      imei: '869201049102915',
+      lat: -8.9094,
+      lng: 33.4582,
+      locationName: 'Uyole Roundabout, Mbeya',
+      region: 'Mbeya',
+      engineStatus: 'IMMOBILIZED',
+      speedKmH: 0,
+      batteryPercent: 62,
+      signalStrengthPercent: 88,
+      lastPingTimestamp: '1 min ago',
+      immobilizedBy: 'Field Recovery Officer (J. Mbwambo)',
+      immobilizedAt: '2026-08-01 14:30',
+      immobilizeReason: 'Severe overdue > 50 days; default risk auto-lock protocol'
+    },
+    notes: 'Severe delinquency. Remote GPRS engine immobilizer engaged.'
+  },
+  {
+    id: 'DM-TZ-8047',
+    crdbControlNumber: '992008047',
+    fullName: 'Rashid Bakari Shabani',
+    phone: '+255 719 440 219',
+    nidaId: '19930812-22100-00002-33',
+    region: 'Tanga',
+    branch: 'Tanga Coastal Branch',
+    guarantorName: 'Shabani Bakari',
+    guarantorPhone: '+255 784 100 293',
+    motorcycleModel: 'TVS HLX 150 ES (Black)',
+    chassisNumber: 'MC 882 TGA / VIN: TVS7719203',
+    cashPrice: 3200000,
+    downPayment: 600000,
+    financedAmount: 2600000,
+    totalInterest: 390000,
+    totalLoanValue: 2990000,
+    repaymentFrequency: 'DAILY',
+    installmentAmount: 11800,
+    startDate: '2026-08-03',
+    maturityDate: '2027-04-10',
+    totalPaid: 0,
+    remainingBalance: 2990000,
+    loanStatus: 'ACTIVE',
+    approvalStage: 'PENDING_DAR_HO_APPROVAL',
+    submittedByVendor: 'Tanga Port Motors Dealer',
+    regionalApprovalBy: 'Regional Mgr Tanga (H. Swai)',
+    lastPaymentDate: undefined,
+    nextPaymentDueDate: '2026-08-10',
+    overdueDays: 0,
+    notes: 'Approved by Tanga Regional HQ. Pending final Dar es Salaam Head Office credit sign-off.'
+  },
+  {
+    id: 'DM-TZ-8048',
+    crdbControlNumber: '992008048',
+    fullName: 'Zuwena Ali Suleiman',
+    phone: '+255 777 908 112',
+    nidaId: '19910405-55100-00001-99',
+    region: 'Zanzibar',
+    branch: 'Stone Town Branch',
+    guarantorName: 'Ali Suleiman',
+    guarantorPhone: '+255 773 112 009',
+    motorcycleModel: 'Bajaj Boxer BM150 (Red)',
+    chassisNumber: 'MC 410 ZNZ / VIN: BJX9018273',
+    cashPrice: 3500000,
+    downPayment: 750000,
+    financedAmount: 2750000,
+    totalInterest: 412500,
+    totalLoanValue: 3162500,
+    repaymentFrequency: 'WEEKLY',
+    installmentAmount: 85000,
+    startDate: '2026-08-04',
+    maturityDate: '2027-05-01',
+    totalPaid: 0,
+    remainingBalance: 3162500,
+    loanStatus: 'ACTIVE',
+    approvalStage: 'PENDING_REGIONAL_REVIEW',
+    submittedByVendor: 'Zanzibar Island Bikes Dealership',
+    lastPaymentDate: undefined,
+    nextPaymentDueDate: '2026-08-11',
+    overdueDays: 0,
+    notes: 'Newly submitted loan application from Zanzibar Dealership.'
   }
 ];
+
+export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
+  {
+    id: 'AUDIT-20260803-001',
+    timestamp: '2026-08-03 15:20:11',
+    userName: 'F. Mwangi',
+    userRole: 'DAR_HEAD_OFFICE',
+    region: 'Dar es Salaam',
+    actionCategory: 'LOAN_WORKFLOW',
+    actionDetails: 'Approved Loan Application DM-TZ-8041 for Juma Rashidi Bakari. TZS 3,000,000 credit limit disbursed.',
+    targetId: 'DM-TZ-8041',
+    ipAddress: '196.201.212.14',
+    severity: 'INFO'
+  },
+  {
+    id: 'AUDIT-20260803-002',
+    timestamp: '2026-08-03 14:30:00',
+    userName: 'J. Mbwambo',
+    userRole: 'FIELD_COLLECTIONS',
+    region: 'Mbeya',
+    actionCategory: 'GPRS_IMMOBILIZER',
+    actionDetails: 'Engaged Remote GPRS Engine Immobilizer on MC 301 MZA (Godfrey Mwita). Overdue > 50 days.',
+    targetId: 'DM-TZ-8046',
+    ipAddress: '41.222.180.91',
+    severity: 'WARNING'
+  },
+  {
+    id: 'AUDIT-20260802-003',
+    timestamp: '2026-08-02 16:42:11',
+    userName: 'CRDB Realtime Webhook Engine',
+    userRole: 'ADMINISTRATOR',
+    region: 'Dar es Salaam',
+    actionCategory: 'RECONCILIATION',
+    actionDetails: 'Auto-reconciled TZS 12,000 via Control No 992008041 (Juma Bakari). Confidence Score 100%.',
+    targetId: 'CRDB-TXN-20260802-9901',
+    ipAddress: '10.140.0.12 (Internal Gateway)',
+    severity: 'INFO'
+  },
+  {
+    id: 'AUDIT-20260802-004',
+    timestamp: '2026-08-02 09:12:05',
+    userName: 'System Admin',
+    userRole: 'ADMINISTRATOR',
+    region: 'Dar es Salaam',
+    actionCategory: 'SECURITY_CONFIG',
+    actionDetails: 'Updated Administrator Security Policy: Enforced 2FA for Dar HO credit approvals.',
+    ipAddress: '196.201.212.2',
+    severity: 'CRITICAL'
+  }
+];
+
+export const INITIAL_SECURITY_CONFIG: SecurityConfig = {
+  require2FAForDarHO: true,
+  ipWhitelistEnabled: true,
+  whitelistedSubnets: ['196.201.212.0/24 (Dar HO)', '41.222.180.0/24 (Mbeya HQ)', '10.140.0.0/16 (CRDB VPN)'],
+  sessionTimeoutMinutes: 30,
+  lastSecretRotationDate: '2026-07-15',
+  failedLoginAttemptsCount: 0,
+  activeSessionsCount: 14
+};
 
 export const INITIAL_TRANSACTIONS: CRDBTransaction[] = [
   {

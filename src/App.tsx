@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CustomerCreditContract, CRDBTransaction, ReconcileStats } from './types';
+import { CustomerCreditContract, CRDBTransaction, ReconcileStats, UserRole } from './types';
 import { Header } from './components/Header';
 import { DashboardView } from './components/DashboardView';
 import { CustomersView } from './components/CustomersView';
@@ -8,11 +8,17 @@ import { ExceptionQueueView } from './components/ExceptionQueueView';
 import { CrdbSandboxView } from './components/CrdbSandboxView';
 import { CustomerPortalView } from './components/CustomerPortalView';
 import { AiAuditView } from './components/AiAuditView';
+import { LoanWorkflowView } from './components/LoanWorkflowView';
+import { GprsTrackingView } from './components/GprsTrackingView';
+import { AuditSecurityView } from './components/AuditSecurityView';
+import { NationwideSalesView } from './components/NationwideSalesView';
 import { ReceiptModal } from './components/ReceiptModal';
 import { CustomerDetailModal } from './components/CustomerDetailModal';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole>('DAR_HEAD_OFFICE');
+  const [currentUserName, setCurrentUserName] = useState<string>('F. Mwangi (Dar HO)');
   const [customers, setCustomers] = useState<CustomerCreditContract[]>([]);
   const [transactions, setTransactions] = useState<CRDBTransaction[]>([]);
   const [stats, setStats] = useState<ReconcileStats>({
@@ -23,7 +29,9 @@ export default function App() {
     overdueContractsCount: 0,
     autoMatchedRate: 100,
     unmatchedCount: 0,
-    todayCollectionTZS: 0
+    todayCollectionTZS: 0,
+    pendingApprovalsCount: 0,
+    immobilizedBikesCount: 0
   });
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -126,7 +134,20 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         unmatchedCount={stats.unmatchedCount}
+        pendingApprovalsCount={stats.pendingApprovalsCount}
         crdbStatus="ONLINE"
+        currentUserRole={currentUserRole}
+        setCurrentUserRole={(role) => {
+          setCurrentUserRole(role);
+          const nameMap: Record<UserRole, string> = {
+            DAR_HEAD_OFFICE: 'F. Mwangi (Dar HO)',
+            REGIONAL_HQ: 'S. Temba (Regional Mgr)',
+            VENDOR: 'Kinondoni TVS Dealer',
+            FIELD_COLLECTIONS: 'J. Mbwambo (Recovery)',
+            ADMINISTRATOR: 'System Admin'
+          };
+          setCurrentUserName(nameMap[role] || 'Staff User');
+        }}
         onRefresh={fetchAllData}
       />
 
@@ -146,6 +167,15 @@ export default function App() {
                 transactions={transactions}
                 onNavigateTab={(tab) => setActiveTab(tab)}
                 onOpenReceipt={(txn) => setActiveReceiptTxn(txn)}
+              />
+            )}
+
+            {activeTab === 'workflow' && (
+              <LoanWorkflowView
+                customers={customers}
+                currentUserRole={currentUserRole}
+                currentUserName={currentUserName}
+                onRefresh={fetchAllData}
               />
             )}
 
@@ -172,6 +202,30 @@ export default function App() {
                 unmatchedTransactions={transactions.filter(t => t.matchStatus === 'UNMATCHED_PENDING_REVIEW')}
                 customers={customers}
                 onManualReconcile={handleManualReconcile}
+              />
+            )}
+
+            {activeTab === 'gprs' && (
+              <GprsTrackingView
+                customers={customers}
+                currentUserRole={currentUserRole}
+                currentUserName={currentUserName}
+                onRefresh={fetchAllData}
+              />
+            )}
+
+            {activeTab === 'analytics' && (
+              <NationwideSalesView
+                customers={customers}
+                transactions={transactions}
+              />
+            )}
+
+            {activeTab === 'audit' && (
+              <AuditSecurityView
+                currentUserRole={currentUserRole}
+                currentUserName={currentUserName}
+                onRefresh={fetchAllData}
               />
             )}
 
