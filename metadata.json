@@ -2,5 +2,5 @@
   "name": "Daima Motorcycles Payment Tracker",
   "description": "Automated payment tracking & CRDB Bank real-time transaction reconciliation platform for motorcycle credit sales in Tanzania.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

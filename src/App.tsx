@@ -7,7 +7,6 @@ import { BankLedgerView } from './components/BankLedgerView';
 import { ExceptionQueueView } from './components/ExceptionQueueView';
 import { CrdbSandboxView } from './components/CrdbSandboxView';
 import { CustomerPortalView } from './components/CustomerPortalView';
-import { AiAuditView } from './components/AiAuditView';
 import { LoanWorkflowView } from './components/LoanWorkflowView';
 import { GprsTrackingView } from './components/GprsTrackingView';
 import { AuditSecurityView } from './components/AuditSecurityView';
@@ -242,10 +241,6 @@ export default function App() {
                 transactions={transactions}
                 onOpenReceipt={(txn) => setActiveReceiptTxn(txn)}
               />
-            )}
-
-            {activeTab === 'ai' && (
-              <AiAuditView customers={customers} />
             )}
           </>
         )}

@@ -215,18 +215,6 @@ export const Header: React.FC<HeaderProps> = ({
             <UserCheck className="w-3.5 h-3.5" />
             <span>Rider Self-Service</span>
           </button>
-
-          <button
-            onClick={() => setActiveTab('ai')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all ${
-              activeTab === 'ai'
-                ? 'bg-indigo-600 text-white font-semibold shadow'
-                : 'text-indigo-300 bg-indigo-950/30 hover:bg-indigo-900/40'
-            }`}
-          >
-            <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-            <span>AI Risk Audit</span>
-          </button>
         </div>
       </div>
     </header>

@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI } from '@google/genai';
 import { INITIAL_CUSTOMERS, INITIAL_TRANSACTIONS, INITIAL_AUDIT_LOGS, INITIAL_SECURITY_CONFIG, CRDB_BANK_CONFIG } from './src/data/mockData.js';
 import { CustomerCreditContract, CRDBTransaction, AuditLogEntry, SecurityConfig, UserRole } from './src/types.js';
 
@@ -510,120 +509,6 @@ async function startServer() {
     txn.receiptNumber = `DM-RCT-${receiptCounter}`;
 
     res.json({ success: true, transaction: txn, customer });
-  });
-
-  // AI Gemini Portfolio Audit & Delinquency Analysis Endpoint
-  app.post('/api/ai/audit', async (req, res) => {
-    try {
-      const apiKey = process.env.GEMINI_API_KEY;
-
-      if (apiKey) {
-        try {
-          const ai = new GoogleGenAI({ apiKey });
-
-          // Create summary payload for Gemini
-          const portfolioSummary = customers.map(c => ({
-            id: c.id,
-            name: c.fullName,
-            phone: c.phone,
-            model: c.motorcycleModel,
-            loanValue: c.totalLoanValue,
-            remainingBalance: c.remainingBalance,
-            status: c.loanStatus,
-            overdueDays: c.overdueDays,
-            lastPaymentDate: c.lastPaymentDate,
-            installment: c.installmentAmount,
-            frequency: c.repaymentFrequency
-          }));
-
-          const prompt = `
-You are the AI Risk & Financial Audit Assistant for "Daima Motorcycles", a motorcycle credit company in Dar es Salaam, Tanzania.
-Analyze the following active customer loan portfolio data:
-${JSON.stringify(portfolioSummary, null, 2)}
-
-Respond with a JSON object ONLY containing:
-{
-  "summary": "Short 2-sentence executive summary of portfolio repayment health",
-  "riskAssessment": {
-    "highRiskCount": number of customers needing urgent attention,
-    "recommendedActions": ["action 1", "action 2", "action 3"]
-  },
-  "reconciliationHealth": "Statement on CRDB Bank automated matching health and efficiency",
-  "suggestedCustomerReminders": [
-    {
-      "customerId": "Customer ID",
-      "customerName": "Customer Name",
-      "phone": "Phone Number",
-      "overdueDays": number,
-      "amountDue": number in TZS,
-      "suggestedMessageSwahili": "Friendly but firm polite payment reminder in Kiswahili referencing CRDB Bank Control Number and Daima Motorcycles."
-    }
-  ]
-}
-`;
-
-          const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-              responseMimeType: 'application/json'
-            }
-          });
-
-          const text = response.text || '{}';
-          const parsed = JSON.parse(text);
-          return res.json({
-            engineSource: 'GEMINI_2.5_FLASH',
-            ...parsed
-          });
-        } catch (geminiError: any) {
-          console.warn('Gemini API call encountered error, providing fallback portfolio risk analysis:', geminiError);
-          // Attach error details to fallback response if key was provided but failed
-          var lastGeminiErrorMsg = geminiError?.message || String(geminiError);
-        }
-      }
-
-      // Fallback Analytical Risk Audit Engine
-      const overdueList = customers.filter(c => c.overdueDays > 0 || c.loanStatus === 'DEFAULT_RISK');
-      const highRiskCount = overdueList.length;
-
-      const totalPortfolio = customers.reduce((acc, c) => acc + c.totalLoanValue, 0);
-      const totalPaid = customers.reduce((acc, c) => acc + c.totalPaid, 0);
-      const repaymentRate = Math.round((totalPaid / (totalPortfolio || 1)) * 100);
-
-      const reminders = customers
-        .filter(c => c.remainingBalance > 0)
-        .slice(0, 5)
-        .map(c => ({
-          customerId: c.id,
-          customerName: c.fullName,
-          phone: c.phone,
-          overdueDays: c.overdueDays,
-          amountDue: c.installmentAmount,
-          suggestedMessageSwahili: c.overdueDays > 0
-            ? `HABARI ${c.fullName.toUpperCase()}, Kumbuka marejesho yako ya Pikitpiki (${c.motorcycleModel}) yamechelewa kwa siku ${c.overdueDays}. Lipa TZS ${c.installmentAmount.toLocaleString()} kupitia CRDB Control No: ${c.crdbControlNumber} au SimBanking ili kuepuka kuzimwa injini kupitia GPRS. Ahsante - Daima Motorcycles.`
-            : `Habari ${c.fullName}, Kumbukumbu ya marejesho yako yajayo ya TZS ${c.installmentAmount.toLocaleString()} kupitia CRDB Control No: ${c.crdbControlNumber}. Daima Motorcycles inakutakia biashara njema.`
-        }));
-
-      res.json({
-        engineSource: 'LOCAL_FALLBACK_ENGINE',
-        apiErrorMessage: typeof lastGeminiErrorMsg !== 'undefined' ? lastGeminiErrorMsg : undefined,
-        summary: `Daima Motorcycles portfolio holds ${customers.length} active contracts with an overall collection efficiency of ${repaymentRate}%. Currently, ${highRiskCount} account(s) exhibit delinquency or immobilizer locks requiring proactive field follow-up.`,
-        riskAssessment: {
-          highRiskCount,
-          recommendedActions: [
-            `Dispatch field recovery team for ${highRiskCount} delinquent account(s) with GPRS tracking.`,
-            `Enforce mandatory CRDB Control Number validation for all incoming SimBanking / Wakala deposits.`,
-            `Automate daily Kiswahili WhatsApp & SMS reminders 24 hours prior to due dates.`
-          ]
-        },
-        reconciliationHealth: `CRDB Realtime Webhook engine auto-reconciliation rate is currently running at 96.8% precision with zero manual interventions needed for valid control numbers.`,
-        suggestedCustomerReminders: reminders
-      });
-    } catch (err: any) {
-      console.error('AI Audit Error:', err);
-      res.status(500).json({ error: err.message || 'Failed to generate AI Audit' });
-    }
   });
 
   // --- VITE MIDDLEWARE OR STATIC SERVING ---
