@@ -102,6 +102,18 @@ export const AiAuditView: React.FC<AiAuditViewProps> = ({ customers }) => {
               </div>
             </div>
 
+            {auditResult.apiErrorMessage && (
+              <div className="bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-xl text-xs space-y-1">
+                <div className="font-bold flex items-center gap-1.5 text-rose-900">
+                  <AlertTriangle className="w-4 h-4 text-rose-600" /> Gemini API Notice:
+                </div>
+                <p className="font-mono text-[11px] text-rose-700">{auditResult.apiErrorMessage}</p>
+                <p className="text-[11px] text-slate-600">
+                  Falling back to local heuristic risk audit engine. Check that your <strong>GEMINI_API_KEY</strong> in <strong>.env</strong> is valid and has access to Google AI Studio models.
+                </p>
+              </div>
+            )}
+
             <p className="text-xs text-slate-700 leading-relaxed font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
               "{auditResult.summary}"
             </p>
