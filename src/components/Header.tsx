@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bike, ShieldCheck, RefreshCw, Smartphone, CreditCard, AlertTriangle, Cpu, UserCheck, Building2, Radio, Lock, BarChart3, User } from 'lucide-react';
+import { Bike, ShieldCheck, RefreshCw, Smartphone, CreditCard, AlertTriangle, Cpu, UserCheck, Building2, Radio, Lock, BarChart3, User, LogOut } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface HeaderProps {
@@ -10,6 +10,8 @@ interface HeaderProps {
   crdbStatus: string;
   currentUserRole: UserRole;
   setCurrentUserRole: (role: UserRole) => void;
+  currentUserName?: string;
+  onLogout?: () => void;
   onRefresh: () => void;
 }
 
@@ -21,6 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
   crdbStatus,
   currentUserRole,
   setCurrentUserRole,
+  currentUserName = 'Staff User',
+  onLogout,
   onRefresh
 }) => {
   return (
@@ -44,15 +48,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right Section: RBAC Switcher & Bank Connection */}
-        <div className="flex flex-wrap items-center gap-3 text-xs">
-          {/* Multi-Tier Role Switcher */}
+        <div className="flex flex-wrap items-center gap-2.5 text-xs">
+          {/* User Profile Badge */}
           <div className="bg-slate-800/90 border border-slate-700/90 rounded-xl px-2.5 py-1 flex items-center space-x-2">
             <User className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-slate-400 font-medium">Role:</span>
+            <span className="text-white font-bold">{currentUserName}</span>
+            <span className="text-slate-500">|</span>
             <select
               value={currentUserRole}
               onChange={(e) => setCurrentUserRole(e.target.value as UserRole)}
               className="bg-slate-900 text-amber-300 font-bold font-mono text-xs focus:outline-none cursor-pointer py-0.5 px-1 rounded"
+              title="Quick Role Switcher"
             >
               <option value="DAR_HEAD_OFFICE">Dar HO Credit Mgr</option>
               <option value="REGIONAL_HQ">Regional HQ Manager</option>
@@ -63,23 +69,34 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Bank Integration Pill */}
-          <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-1.5 flex items-center space-x-2">
+          <div className="hidden lg:flex bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-1.5 items-center space-x-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
             <span className="text-slate-300 font-medium">CRDB:</span>
             <span className="text-amber-400 font-mono font-bold">0150284930100</span>
             <span className="text-slate-500">|</span>
             <span className="text-emerald-400 font-medium flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> API Connected
+              <ShieldCheck className="w-3.5 h-3.5" /> Connected
             </span>
           </div>
 
           <button
             onClick={onRefresh}
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors flex items-center space-x-1"
+            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors flex items-center space-x-1"
             title="Refresh System Ledger"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
           </button>
+
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl transition-colors flex items-center space-x-1.5 font-semibold text-xs"
+              title="Sign Out of Session"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-400" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -154,18 +171,6 @@ export const Header: React.FC<HeaderProps> = ({
                 {unmatchedCount}
               </span>
             )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('gprs')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all ${
-              activeTab === 'gprs'
-                ? 'bg-rose-600 text-white font-semibold shadow'
-                : 'text-rose-300 bg-rose-950/30 hover:bg-rose-900/40'
-            }`}
-          >
-            <Radio className="w-3.5 h-3.5 text-rose-400" />
-            <span>GPRS & Remote Immobilizer</span>
           </button>
 
           <button

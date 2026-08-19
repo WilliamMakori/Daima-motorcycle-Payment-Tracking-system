@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CustomerCreditContract, CRDBTransaction, ReconcileStats, UserRole } from './types';
 import { Header } from './components/Header';
+import { LoginPage } from './components/LoginPage';
 import { DashboardView } from './components/DashboardView';
 import { CustomersView } from './components/CustomersView';
 import { BankLedgerView } from './components/BankLedgerView';
@@ -8,16 +9,25 @@ import { ExceptionQueueView } from './components/ExceptionQueueView';
 import { CrdbSandboxView } from './components/CrdbSandboxView';
 import { CustomerPortalView } from './components/CustomerPortalView';
 import { LoanWorkflowView } from './components/LoanWorkflowView';
-import { GprsTrackingView } from './components/GprsTrackingView';
 import { AuditSecurityView } from './components/AuditSecurityView';
 import { NationwideSalesView } from './components/NationwideSalesView';
 import { ReceiptModal } from './components/ReceiptModal';
 import { CustomerDetailModal } from './components/CustomerDetailModal';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('daima_auth_session') === 'true';
+  });
   const [activeTab, setActiveTab] = useState<string>('dashboard');
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole>('DAR_HEAD_OFFICE');
-  const [currentUserName, setCurrentUserName] = useState<string>('F. Mwangi (Dar HO)');
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole>(() => {
+    return (localStorage.getItem('daima_user_role') as UserRole) || 'DAR_HEAD_OFFICE';
+  });
+  const [currentUserName, setCurrentUserName] = useState<string>(() => {
+    return localStorage.getItem('daima_user_name') || 'F. Mwangi (Dar HO)';
+  });
+  const [isRiderSession, setIsRiderSession] = useState<boolean>(() => {
+    return localStorage.getItem('daima_is_rider') === 'true';
+  });
   const [customers, setCustomers] = useState<CustomerCreditContract[]>([]);
   const [transactions, setTransactions] = useState<CRDBTransaction[]>([]);
   const [stats, setStats] = useState<ReconcileStats>({
@@ -114,9 +124,43 @@ export default function App() {
     }
   };
 
+  const handleLoginSuccess = (user: { name: string; role: UserRole; isRider?: boolean; riderControlNum?: string }) => {
+    setIsAuthenticated(true);
+    setCurrentUserName(user.name);
+    setCurrentUserRole(user.role);
+    setIsRiderSession(!!user.isRider);
+
+    localStorage.setItem('daima_auth_session', 'true');
+    localStorage.setItem('daima_user_name', user.name);
+    localStorage.setItem('daima_user_role', user.role);
+    localStorage.setItem('daima_is_rider', user.isRider ? 'true' : 'false');
+
+    if (user.isRider) {
+      setActiveTab('portal');
+    } else {
+      setActiveTab('dashboard');
+    }
+
+    showToast(`Welcome, ${user.name}! Authenticated into Daima Credit Portal.`);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setIsRiderSession(false);
+    localStorage.removeItem('daima_auth_session');
+    localStorage.removeItem('daima_user_name');
+    localStorage.removeItem('daima_user_role');
+    localStorage.removeItem('daima_is_rider');
+    showToast('Signed out of Daima Motorcycles Credit Portal.');
+  };
+
   const selectedCustomerForReceipt = activeReceiptTxn
     ? customers.find(c => c.id === activeReceiptTxn.matchedCustomerId)
     : null;
+
+  if (!isAuthenticated) {
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 font-sans flex flex-col">
@@ -136,6 +180,8 @@ export default function App() {
         pendingApprovalsCount={stats.pendingApprovalsCount}
         crdbStatus="ONLINE"
         currentUserRole={currentUserRole}
+        currentUserName={currentUserName}
+        onLogout={handleLogout}
         setCurrentUserRole={(role) => {
           setCurrentUserRole(role);
           const nameMap: Record<UserRole, string> = {
@@ -145,7 +191,10 @@ export default function App() {
             FIELD_COLLECTIONS: 'J. Mbwambo (Recovery)',
             ADMINISTRATOR: 'System Admin'
           };
-          setCurrentUserName(nameMap[role] || 'Staff User');
+          const newName = nameMap[role] || 'Staff User';
+          setCurrentUserName(newName);
+          localStorage.setItem('daima_user_role', role);
+          localStorage.setItem('daima_user_name', newName);
         }}
         onRefresh={fetchAllData}
       />
@@ -201,15 +250,6 @@ export default function App() {
                 unmatchedTransactions={transactions.filter(t => t.matchStatus === 'UNMATCHED_PENDING_REVIEW')}
                 customers={customers}
                 onManualReconcile={handleManualReconcile}
-              />
-            )}
-
-            {activeTab === 'gprs' && (
-              <GprsTrackingView
-                customers={customers}
-                currentUserRole={currentUserRole}
-                currentUserName={currentUserName}
-                onRefresh={fetchAllData}
               />
             )}
 
